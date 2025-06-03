@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import MainLayout from "../../layouts/MainLayout";
 import { useEffect, useState } from "react";
 import { fetchRecipeById } from "@/api/recipes";
+import CardPageSidebar from "@/components/CardPage/CardPageSidebar";
 
 interface Ingredient {
     ingredient: string;
@@ -180,11 +181,11 @@ export default function RecipeById() {
                             mb: 2,
                         }}
                     >
-                        Sidebar
+                        Related Posts
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Дополнительная информация, рекомендации, или фильтры.
-                    </Typography>
+                    <CardPageSidebar
+                        categoryName={recipe.category}
+                    />
                 </Box>
             </Box>
         </MainLayout>
