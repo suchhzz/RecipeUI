@@ -1,9 +1,10 @@
 import express from 'express';
 import recipeRouter from './routes/recipeRoutes';
 import cors from 'cors';
+import env from './config/env';
 
 const app = express();
-const PORT = 8080;
+const PORT = env.PORT;
 
 app.use(express.json());
 app.use(cors());
