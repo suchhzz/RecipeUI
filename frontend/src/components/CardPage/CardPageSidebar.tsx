@@ -3,24 +3,6 @@ import CardPageSidebarItem from "./CardPageSidebarItem";
 import { useEffect, useState } from "react";
 import { fetchRecipesListByFilters } from "@/api/recipes";
 
-interface Ingredient {
-    ingredient: string;
-    measure: string;
-}
-
-interface Recipe {
-    id: string;
-    name: string;
-    category: string | null;
-    area: string | null;
-    instructions: string;
-    thumbnail: string;
-    youtube: string | null;
-    tags: string[];
-    source: string | null;
-    ingredients: Ingredient[];
-}
-
 export default function CardPageSidebar({ categoryName }: { categoryName: string | null }) {
 
     const [recipeList, setRecipeList] = useState<Recipe[]>([]);

@@ -1,12 +1,6 @@
 import { Box, Typography, Card, CardMedia, CardContent } from "@mui/material";
 import Link from "next/link";
 
-interface RecipeCardItem {
-    id: number;
-    name: string;
-    thumbnail: string;
-}
-
 export default function RecipeCard({ recipeCardItem }: { recipeCardItem: RecipeCardItem }) {
     const href = `/recipes/${recipeCardItem.id}`;
 

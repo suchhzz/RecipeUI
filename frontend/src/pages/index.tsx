@@ -7,12 +7,6 @@ import { useEffect, useState } from "react";
 import { fetchRecipesList, fetchRecipesListByFilters } from "@/api/recipes";
 import { useRouter } from "next/router";
 
-interface RecipeCardItem {
-  id: number;
-  name: string;
-  thumbnail: string;
-}
-
 export default function RecipeList() {
   const router = useRouter();
 
@@ -109,7 +103,7 @@ export default function RecipeList() {
     }
 
     loadRecipeList();
-  }, [appliedFilter, page]); // <--- добавлен page
+  }, [appliedFilter, page]);
 
   const getRecipeByFilter = () => {
     setPage(1);

@@ -1,24 +1,6 @@
 import Link from "next/link";
 import { Box, Typography } from "@mui/material";
 
-interface Ingredient {
-    ingredient: string;
-    measure: string;
-}
-
-interface Recipe {
-    id: string;
-    name: string;
-    category: string | null;
-    area: string | null;
-    instructions: string;
-    thumbnail: string;
-    youtube: string | null;
-    tags: string[];
-    source: string | null;
-    ingredients: Ingredient[];
-}
-
 interface CardPageSidebarItemProps {
     recipe: Recipe;
     categoryName?: string;

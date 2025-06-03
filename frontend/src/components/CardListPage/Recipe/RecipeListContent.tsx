@@ -1,12 +1,6 @@
 import { Box } from "@mui/material";
 import RecipeCard from "./RecipeCard";
 
-interface RecipeCardItem {
-    id: number,
-    name: string,
-    thumbnail: string,
-}
-
 export default function RecipeListContent({ recipeList }: { recipeList: RecipeCardItem[] }) {
     return (
         <>
