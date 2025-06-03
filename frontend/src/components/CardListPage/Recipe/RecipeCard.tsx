@@ -1,6 +1,12 @@
 import { Box, Typography, Card, CardMedia, CardContent } from "@mui/material";
 
-export default function RecipeCard() {
+interface RecipeCardItem {
+    id: number;
+    name: string;
+    thumbnail: string;
+}
+
+export default function RecipeCard({ recipeCardItem }: { recipeCardItem: RecipeCardItem }) {
     return (
         <Card
             sx={{
@@ -16,8 +22,14 @@ export default function RecipeCard() {
             <CardMedia
                 component="img"
                 height="200"
-                image="https://www.themealdb.com/images/media/meals/xd9aj21740432378.jpg"
+                image={recipeCardItem.thumbnail}
                 alt="Recipe Image"
+
+                sx={{
+                    "&:hover": {
+                        cursor: 'pointer'
+                    }
+                }}
             />
             <CardContent>
                 <Typography
@@ -26,9 +38,13 @@ export default function RecipeCard() {
                     sx={{
                         fontWeight: 600,
                         color: "text.primary",
+                        "&:hover": {
+                            color: "warning.main",
+                            cursor: 'pointer'
+                        }
                     }}
                 >
-                    Delicious Recipe Title
+                    {recipeCardItem.name}
                 </Typography>
             </CardContent>
         </Card>
