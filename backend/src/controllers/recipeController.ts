@@ -11,23 +11,27 @@ export const getRecipeList = async (req: Request, res: Response) => {
             ingredient: req.query.ingredient as string | undefined,
             area: req.query.area as string | undefined,
             category: req.query.category as string | undefined,
-        }
+        };
+
         const page = parseInt(req.query.page as string) || 1;
         const limit = DEFAULT_PAGE_SIZE;
         const offset = (page - 1) * limit;
 
         const recipeList = await RecipeService.getRecipes(filters);
+        const totalItems = recipeList.length;
+        const totalPages = Math.ceil(totalItems / limit);
 
         const paginated = recipeList.slice(offset, offset + limit);
 
         res.json({
             page,
+            totalPages,
             recipes: paginated.map(toRecipeListItemDTO),
-        })
+        });
     } catch (e) {
-        res.status(500).json({ error: (e as Error).message })
+        res.status(500).json({ error: (e as Error).message });
     }
-}
+};
 
 export const getRecipeById = async (req: Request, res: Response) => {
     try {

@@ -25,6 +25,10 @@ class RecipeService {
             }
 
             if (filters.category) {
+
+                console.log('by category');
+                console.log(`${this.baseUrl}${api.filterByCategory}${filters.category}`);
+
                 const { data } = await axios.get(`${this.baseUrl}${api.filterByCategory}${filters.category}`);
                 return data.meals || [];
             }
