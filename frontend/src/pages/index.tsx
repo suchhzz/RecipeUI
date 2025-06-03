@@ -5,38 +5,99 @@ import AppliedFilters from "@/components/CardListPage/AppliedFilters";
 import FilterSidebar from "@/components/CardListPage/FilterSidebar";
 import { useEffect, useState } from "react";
 import { fetchRecipesList, fetchRecipesListByFilters } from "@/api/recipes";
+import { useRouter } from "next/router";
 
 interface RecipeCardItem {
-  id: number,
-  name: string,
-  thumbnail: string,
+  id: number;
+  name: string;
+  thumbnail: string;
 }
 
 export default function RecipeList() {
-  const [recipeList, setRecipeList] = useState<RecipeCardItem[]>([]);
+  const router = useRouter();
+
   const [selectedFilter, setSelectedFilter] = useState<string>("");
   const [filterValue, setFilterValue] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+
+  const [recipeList, setRecipeList] = useState<RecipeCardItem[]>([]);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [loading, setLoading] = useState(false);
   const [appliedFilterContent, setAppliedFilterContent] = useState<string>("");
 
-  const [page, setPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const [isFiltered, setIsFiltered] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [appliedFilter, setAppliedFilter] = useState<{ filter: string; value: string; page: number } | null>(null);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const { filter, value, page: pageQuery } = router.query;
+
+    setSelectedFilter(Array.isArray(filter) ? filter[0] : filter || "");
+    setFilterValue(Array.isArray(value) ? value[0] : value || "");
+
+    const pageNumber = pageQuery ? parseInt(Array.isArray(pageQuery) ? pageQuery[0] : pageQuery, 10) : 1;
+    setPage(pageNumber);
+
+    setAppliedFilter({
+      filter: Array.isArray(filter) ? filter[0] : filter || "",
+      value: Array.isArray(value) ? value[0] : value || "",
+      page: pageNumber,
+    });
+
+    setAppliedFilterContent(Array.isArray(value) ? value[0] : value || "");
+  }, [router.isReady, router.query]);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const { filter, value, page: pageQuery } = router.query;
+
+    if (!pageQuery) {
+      router.replace(
+        {
+          pathname: router.pathname,
+          query: {
+            ...router.query,
+            page: "1",
+          },
+        },
+        undefined,
+        { shallow: true }
+      );
+      return;
+    }
+
+    setSelectedFilter(Array.isArray(filter) ? filter[0] : filter || "");
+    setFilterValue(Array.isArray(value) ? value[0] : value || "");
+
+    const pageNumber = pageQuery
+      ? parseInt(Array.isArray(pageQuery) ? pageQuery[0] : pageQuery, 10)
+      : 1;
+    setPage(pageNumber);
+
+    setAppliedFilter({
+      filter: Array.isArray(filter) ? filter[0] : filter || "",
+      value: Array.isArray(value) ? value[0] : value || "",
+      page: pageNumber,
+    });
+
+    setAppliedFilterContent(Array.isArray(value) ? value[0] : value || "");
+  }, [router.isReady, router.query]);
 
   useEffect(() => {
     async function loadRecipeList() {
       setLoading(true);
       try {
-        if (isFiltered) {
+        if (appliedFilter && appliedFilter.filter && appliedFilter.value) {
           const data = await fetchRecipesListByFilters({
-            selectedFilter,
-            filterValue,
-            page,
+            selectedFilter: appliedFilter.filter,
+            filterValue: appliedFilter.value,
+            page: appliedFilter.page,
           });
           setRecipeList(data.recipes);
           setTotalPages(data.totalPages);
         } else {
-          const data = await fetchRecipesList(page);
+          const data = await fetchRecipesList(appliedFilter ? appliedFilter.page : page);
           setRecipeList(data.recipes);
           setTotalPages(data.totalPages);
         }
@@ -48,47 +109,71 @@ export default function RecipeList() {
     }
 
     loadRecipeList();
-  }, [page, isFiltered]);
+  }, [appliedFilter]);
 
-  const getRecipeByFilter = async () => {
-    setLoading(true);
-    try {
-      setPage(1);
-      setIsFiltered(true);
-      const data = await fetchRecipesListByFilters({
-        selectedFilter,
-        filterValue,
-        page: 1,
-      });
+  const getRecipeByFilter = () => {
+    setPage(1);
+    setAppliedFilter({ filter: selectedFilter, value: filterValue, page: 1 });
+    setAppliedFilterContent(filterValue);
 
-      setRecipeList(data.recipes);
-      setTotalPages(data.totalPages);
-      setAppliedFilterContent(`${filterValue}`);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
+    const query: any = { page: "1" };
+
+    if (selectedFilter && filterValue) {
+      query.filter = selectedFilter;
+      query.value = filterValue;
     }
+
+    router.push(
+      {
+        pathname: router.pathname,
+        query,
+      },
+      undefined,
+      { shallow: true }
+    );
   };
 
-  const resetFilters = async () => {
+
+  const resetFilters = () => {
     setSelectedFilter("");
     setFilterValue("");
     setAppliedFilterContent("");
-    setIsFiltered(false);
     setPage(1);
-    setLoading(true);
-    try {
-      const data = await fetchRecipesList(1);
-      setRecipeList(data.recipes);
-      setTotalPages(data.totalPages);
-      setAppliedFilterContent("");
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    setAppliedFilter(null);
+
+    router.push(
+      {
+        pathname: router.pathname,
+        query: {},
+      },
+      undefined,
+      { shallow: true }
+    );
   };
+
+  const onPageChange = (_: any, value: number) => {
+    setPage(value);
+
+    const query: any = { page: value.toString() };
+
+    if (appliedFilter?.filter && appliedFilter.value) {
+      const newAppliedFilter = { ...appliedFilter, page: value };
+      setAppliedFilter(newAppliedFilter);
+
+      query.filter = newAppliedFilter.filter;
+      query.value = newAppliedFilter.value;
+    }
+
+    router.push(
+      {
+        pathname: router.pathname,
+        query,
+      },
+      undefined,
+      { shallow: true }
+    );
+  };
+
 
   return (
     <MainLayout>
@@ -136,16 +221,17 @@ export default function RecipeList() {
             <RecipeListContent recipeList={recipeList} />
           )}
 
-          {!loading &&
+          {!loading && (
             <Box display="flex" justifyContent="center" mt={3}>
               <Pagination
                 count={totalPages}
                 page={page}
-                onChange={(_, value) => setPage(value)}
+                onChange={onPageChange}
                 color="primary"
                 disabled={loading}
               />
-            </Box>}
+            </Box>
+          )}
         </Box>
       </Box>
     </MainLayout>
