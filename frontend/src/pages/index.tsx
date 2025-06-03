@@ -32,19 +32,19 @@ export default function RecipeList() {
 
     const { filter, value, page: pageQuery } = router.query;
 
-    setSelectedFilter(Array.isArray(filter) ? filter[0] : filter || "");
-    setFilterValue(Array.isArray(value) ? value[0] : value || "");
-
+    const selected = Array.isArray(filter) ? filter[0] : filter || "";
+    const val = Array.isArray(value) ? value[0] : value || "";
     const pageNumber = pageQuery ? parseInt(Array.isArray(pageQuery) ? pageQuery[0] : pageQuery, 10) : 1;
+
+    setSelectedFilter(selected);
+    setFilterValue(val);
     setPage(pageNumber);
 
-    setAppliedFilter({
-      filter: Array.isArray(filter) ? filter[0] : filter || "",
-      value: Array.isArray(value) ? value[0] : value || "",
-      page: pageNumber,
-    });
+    setAppliedFilterContent(val);
 
-    setAppliedFilterContent(Array.isArray(value) ? value[0] : value || "");
+    setAppliedFilter(
+      selected && val ? { filter: selected, value: val, page: pageNumber } : null
+    );
   }, [router.isReady, router.query]);
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function RecipeList() {
           setRecipeList(data.recipes);
           setTotalPages(data.totalPages);
         } else {
-          const data = await fetchRecipesList(appliedFilter ? appliedFilter.page : page);
+          const data = await fetchRecipesList(page);
           setRecipeList(data.recipes);
           setTotalPages(data.totalPages);
         }
@@ -109,7 +109,7 @@ export default function RecipeList() {
     }
 
     loadRecipeList();
-  }, [appliedFilter]);
+  }, [appliedFilter, page]); // <--- добавлен page
 
   const getRecipeByFilter = () => {
     setPage(1);

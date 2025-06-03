@@ -4,6 +4,7 @@ import MainLayout from "../../layouts/MainLayout";
 import { useEffect, useState } from "react";
 import { fetchRecipeById } from "@/api/recipes";
 import CardPageSidebar from "@/components/CardPage/CardPageSidebar";
+import Link from "next/link";
 
 interface Ingredient {
     ingredient: string;
@@ -47,13 +48,6 @@ export default function RecipeById() {
 
         loadRecipe();
     }, [recipeId]);
-
-    const navigateToFilter = (filterType: "country" | "ingredient", value: string) => {
-        router.push({
-            pathname: "/",
-            query: { [`filter_${filterType}`]: value },
-        });
-    };
 
     if (loading || !recipe) {
         return (
@@ -113,19 +107,30 @@ export default function RecipeById() {
                         {recipe.name}
                     </Typography>
 
-                    <Typography
-                        variant="subtitle1"
-                        align="center"
-                        sx={{
-                            mb: 3,
-                            cursor: "pointer",
-                            color: "primary.main",
-                            textDecoration: "underline",
+                    <Link
+                        href={{
+                            pathname: "/",
+                            query: {
+                                page: "1",
+                                filter: "Area",
+                                value: recipe.area,
+                            },
                         }}
-                        onClick={() => navigateToFilter("country", recipe.area ?? "")}
+                        passHref
                     >
-                        {recipe.area}
-                    </Typography>
+                        <Typography
+                            variant="subtitle1"
+                            align="center"
+                            sx={{
+                                mb: 3,
+                                cursor: "pointer",
+                                color: "primary.main",
+                                textDecoration: "underline",
+                            }}
+                        >
+                            {recipe.area}
+                        </Typography>
+                    </Link>
 
                     <Typography
                         variant="body1"
@@ -149,14 +154,22 @@ export default function RecipeById() {
                             }}
                         >
                             {recipe.ingredients.map((ingredient) => (
-                                <Button
+                                <Link
                                     key={ingredient.ingredient}
-                                    variant="outlined"
-                                    size="small"
-                                    onClick={() => navigateToFilter("ingredient", ingredient.ingredient)}
+                                    href={{
+                                        pathname: "/",
+                                        query: {
+                                            page: "1",
+                                            filter: "Ingredient",
+                                            value: ingredient.ingredient,
+                                        },
+                                    }}
+                                    passHref
                                 >
-                                    {ingredient.ingredient}
-                                </Button>
+                                    <Button variant="outlined" size="small" component="a">
+                                        {ingredient.ingredient}
+                                    </Button>
+                                </Link>
                             ))}
                         </Box>
                     </Box>

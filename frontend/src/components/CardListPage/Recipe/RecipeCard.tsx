@@ -1,4 +1,5 @@
 import { Box, Typography, Card, CardMedia, CardContent } from "@mui/material";
+import Link from "next/link";
 
 interface RecipeCardItem {
     id: number;
@@ -7,6 +8,8 @@ interface RecipeCardItem {
 }
 
 export default function RecipeCard({ recipeCardItem }: { recipeCardItem: RecipeCardItem }) {
+    const href = `/recipes/${recipeCardItem.id}`;
+
     return (
         <Card
             sx={{
@@ -19,33 +22,38 @@ export default function RecipeCard({ recipeCardItem }: { recipeCardItem: RecipeC
                 },
             }}
         >
-            <CardMedia
-                component="img"
-                height="200"
-                image={recipeCardItem.thumbnail}
-                alt="Recipe Image"
-
-                sx={{
-                    "&:hover": {
-                        cursor: 'pointer'
-                    }
-                }}
-            />
-            <CardContent>
-                <Typography
-                    variant="h6"
-                    component="h2"
+            <Link href={href} passHref>
+                <CardMedia
+                    component="img"
+                    height="200"
+                    image={recipeCardItem.thumbnail}
+                    alt="Recipe Image"
                     sx={{
-                        fontWeight: 600,
-                        color: "text.primary",
                         "&:hover": {
-                            color: "warning.main",
-                            cursor: 'pointer'
-                        }
+                            cursor: "pointer",
+                        },
                     }}
-                >
-                    {recipeCardItem.name}
-                </Typography>
+                />
+            </Link>
+
+            <CardContent>
+                <Link href={href} passHref>
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        sx={{
+                            fontWeight: 600,
+                            color: "text.primary",
+                            "&:hover": {
+                                color: "warning.main",
+                                cursor: "pointer",
+                            },
+                            textDecoration: 'none',
+                        }}
+                    >
+                        {recipeCardItem.name}
+                    </Typography>
+                </Link>
             </CardContent>
         </Card>
     );

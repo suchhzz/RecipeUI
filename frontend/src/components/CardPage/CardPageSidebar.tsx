@@ -54,7 +54,7 @@ export default function CardPageSidebar({ categoryName }: { categoryName: string
         >
             {recipeList.length > 0 ? (
                 recipeList.map((recipe: Recipe) => (
-                    <CardPageSidebarItem key={recipe.id} recipe={recipe} />
+                    <CardPageSidebarItem key={recipe.id} recipe={recipe} categoryName={categoryName ?? undefined} />
                 ))
             ) : (
                 <Box>No recipes...</Box>
