@@ -1,6 +1,3 @@
-# ================================
-# General Node / Yarn / pnpm
-# ================================
 **/node_modules/
 **/.pnp/
 **/.pnp.*
@@ -8,39 +5,28 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+backend/node_modules/
 
-# Yarn v2+
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
 
-# ================================
-# Frontend (Next.js)
-# ================================
 frontend/.next/
 frontend/out/
 frontend/.turbo/
 frontend/next-env.d.ts
 
-# ================================
-# Backend (Express + TS)
-# ================================
 backend/dist/
 
-# ================================
-# Common
-# ================================
 *.tsbuildinfo
 .env*
 !.env.example
 
-# Tests
 **/coverage/
 **/nyc_output/
 
-# IDE & system
 .vscode/
 .idea/
 *.sublime-project
@@ -48,8 +34,6 @@ backend/dist/
 .DS_Store
 Thumbs.db
 
-# Vercel
 .vercel
 
-# Build output
 /build/
