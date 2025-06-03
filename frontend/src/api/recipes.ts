@@ -23,3 +23,7 @@ export async function fetchRecipesListByFilters(params: FilterParams) {
         }
     }).then(res => res.data);
 }
+
+export async function fetchRecipeById(id: number) {
+    return await axios.get(`http://localhost:8080/recipes/${id}`);
+}

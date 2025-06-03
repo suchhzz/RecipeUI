@@ -12,7 +12,7 @@ interface RecipeCardItem {
   thumbnail: string,
 }
 
-export default function Home() {
+export default function RecipeList() {
   const [recipeList, setRecipeList] = useState<RecipeCardItem[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>("");
   const [filterValue, setFilterValue] = useState<string>("");
