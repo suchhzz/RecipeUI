@@ -19,7 +19,7 @@ export default function RecipeList() {
   const [loading, setLoading] = useState(false);
   const [appliedFilterContent, setAppliedFilterContent] = useState<string>("");
 
-  const [appliedFilter, setAppliedFilter] = useState<{ filter: string; value: string; page: number } | null>(null);
+  const [readyToFetch, setReadyToFetch] = useState(false);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -28,23 +28,16 @@ export default function RecipeList() {
 
     const selected = Array.isArray(filter) ? filter[0] : filter || "";
     const val = Array.isArray(value) ? value[0] : value || "";
-    const pageNumber = pageQuery ? parseInt(Array.isArray(pageQuery) ? pageQuery[0] : pageQuery, 10) : 1;
+    const pageNumber = pageQuery
+      ? parseInt(Array.isArray(pageQuery) ? pageQuery[0] : pageQuery, 10)
+      : 1;
 
     setSelectedFilter(selected);
     setFilterValue(val);
     setPage(pageNumber);
-
     setAppliedFilterContent(val);
 
-    setAppliedFilter(
-      selected && val ? { filter: selected, value: val, page: pageNumber } : null
-    );
-  }, [router.isReady, router.query]);
-
-  useEffect(() => {
-    if (!router.isReady) return;
-
-    const { filter, value, page: pageQuery } = router.query;
+    setReadyToFetch(true);
 
     if (!pageQuery) {
       router.replace(
@@ -58,35 +51,20 @@ export default function RecipeList() {
         undefined,
         { shallow: true }
       );
-      return;
     }
-
-    setSelectedFilter(Array.isArray(filter) ? filter[0] : filter || "");
-    setFilterValue(Array.isArray(value) ? value[0] : value || "");
-
-    const pageNumber = pageQuery
-      ? parseInt(Array.isArray(pageQuery) ? pageQuery[0] : pageQuery, 10)
-      : 1;
-    setPage(pageNumber);
-
-    setAppliedFilter({
-      filter: Array.isArray(filter) ? filter[0] : filter || "",
-      value: Array.isArray(value) ? value[0] : value || "",
-      page: pageNumber,
-    });
-
-    setAppliedFilterContent(Array.isArray(value) ? value[0] : value || "");
   }, [router.isReady, router.query]);
 
   useEffect(() => {
+    if (!readyToFetch) return;
+
     async function loadRecipeList() {
       setLoading(true);
       try {
-        if (appliedFilter && appliedFilter.filter && appliedFilter.value) {
+        if (selectedFilter && filterValue) {
           const data = await fetchRecipesListByFilters({
-            selectedFilter: appliedFilter.filter,
-            filterValue: appliedFilter.value,
-            page: appliedFilter.page,
+            selectedFilter,
+            filterValue,
+            page,
           });
           setRecipeList(data.recipes);
           setTotalPages(data.totalPages);
@@ -103,15 +81,10 @@ export default function RecipeList() {
     }
 
     loadRecipeList();
-  }, [appliedFilter, page]);
+  }, [readyToFetch, selectedFilter, filterValue, page]);
 
   const getRecipeByFilter = () => {
-    setPage(1);
-    setAppliedFilter({ filter: selectedFilter, value: filterValue, page: 1 });
-    setAppliedFilterContent(filterValue);
-
     const query: any = { page: "1" };
-
     if (selectedFilter && filterValue) {
       query.filter = selectedFilter;
       query.value = filterValue;
@@ -127,18 +100,16 @@ export default function RecipeList() {
     );
   };
 
-
   const resetFilters = () => {
     setSelectedFilter("");
     setFilterValue("");
     setAppliedFilterContent("");
     setPage(1);
-    setAppliedFilter(null);
 
     router.push(
       {
         pathname: router.pathname,
-        query: {},
+        query: { page: "1" },
       },
       undefined,
       { shallow: true }
@@ -146,17 +117,14 @@ export default function RecipeList() {
   };
 
   const onPageChange = (_: any, value: number) => {
-    setPage(value);
-
     const query: any = { page: value.toString() };
 
-    if (appliedFilter?.filter && appliedFilter.value) {
-      const newAppliedFilter = { ...appliedFilter, page: value };
-      setAppliedFilter(newAppliedFilter);
-
-      query.filter = newAppliedFilter.filter;
-      query.value = newAppliedFilter.value;
+    if (selectedFilter && filterValue) {
+      query.filter = selectedFilter;
+      query.value = filterValue;
     }
+
+    setPage(value);
 
     router.push(
       {
@@ -167,7 +135,6 @@ export default function RecipeList() {
       { shallow: true }
     );
   };
-
 
   return (
     <MainLayout>
